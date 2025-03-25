@@ -1,291 +1,182 @@
-# Importing necessary libraries for handling dates
 from datetime import date
 
+# =============================
 # Class: Hotel
-# Describes a hotel with multiple rooms, and provides functions to manage room listings and hotel details
+# Association: Composition with Room, Aggregation with Guest
+# =============================
 class Hotel:
-    """Represents a hotel with rooms and basic information."""
-    
-    def __init__(self, name, location, number_of_rooms, hotel_rating, contact_number):
+    """Represents a hotel that owns rooms and hosts guests."""
+
+    def __init__(self, name: str, location: str, hotel_rating: float, contact_number: str):
         self.__name = name  # Hotel name
-        self.__location = location  # Location of the hotel
-        self.__number_of_rooms = number_of_rooms  # Total number of rooms in the hotel
-        self.__hotel_rating = hotel_rating  # Rating of the hotel
-        self.__contact_number = contact_number  # Contact information of the hotel
-        self.__rooms = []  # List to store room objects
-    
-    def addRoom(self, room):
-        """Adds a room to the hotel."""
-        self.__rooms.append(room)  # Adds a room to the list of rooms
-    
-    def removeRoom(self, room):
-        """Removes a room from the hotel."""
-        if room in self.__rooms:
-            self.__rooms.remove(room)  # Removes the specified room from the list
-    
-    def updateHotelRating(self, new_rating):
-        """Updates the hotel's rating."""
-        self.__hotel_rating = new_rating  # Sets a new rating for the hotel
-    
-    def getContactNumber(self):
-        """Returns the contact number of the hotel."""
-        return self.__contact_number  # Returns the contact number
-    
-    def setContactNumber(self, contact):
-        """Sets a new contact number for the hotel."""
-        self.__contact_number = contact  # Updates the contact number
-    
-    def getNumberOfRooms(self):
-        """Returns the number of rooms in the hotel."""
-        return len(self.__rooms)  # Returns the total count of rooms
-    
-    def setNumberOfRooms(self, count):
-        """Sets the number of rooms in the hotel."""
-        self.__number_of_rooms = count  # Updates the number of rooms
+        self.__location = location  # Hotel location
+        self.__hotel_rating = hotel_rating  # Hotel rating
+        self.__contact_number = contact_number  # Hotel contact number
+        self.__rooms = []  # Composition: list of Room objects
 
+    def add_room(self, room):  # Adds a room to the hotel
+        self.__rooms.append(room)
+
+    def get_available_rooms(self):  # Returns list of available rooms
+        return [room for room in self.__rooms if room.is_available()]
+
+    def get_name(self):  # Returns the name of the hotel
+        return self.__name
+
+# =============================
 # Class: Room
-# Represents an individual room with specific attributes like room type, availability, and price
+# Composition with Hotel
+# =============================
 class Room:
-    """Represents a hotel room."""
-    
-    def __init__(self, room_number, room_type, price_per_night, availability_status, amenities, max_occupancy, floor_number):
-        self.__room_number = room_number  # Room number (unique identifier)
-        self.__room_type = room_type  # Type of room (e.g., single, double)
-        self.__price_per_night = price_per_night  # Price per night for the room
-        self.__availability_status = availability_status  # Room availability status (True/False)
-        self.__amenities = amenities  # List of amenities available in the room
-        self.__max_occupancy = max_occupancy  # Maximum number of people allowed in the room
-        self.__floor_number = floor_number  # Floor number where the room is located
-    
-    def bookRoom(self):
-        """Books the room if available."""
+    """Represents a hotel room with details like type, price, and availability."""
+
+    def __init__(self, room_number: int, room_type: str, price_per_night: float, amenities: list):
+        self.__room_number = room_number  # Room number
+        self.__room_type = room_type  # Type (Single, Double, etc.)
+        self.__price_per_night = price_per_night  # Nightly price
+        self.__availability_status = True  # Available by default
+        self.__amenities = amenities  # List of amenities
+
+    def book_room(self):  # Book the room if it's available
         if self.__availability_status:
-            self.__availability_status = False  # Marks room as unavailable
-            return True  # Room is successfully booked
-        return False  # Room is not available
-    
-    def checkOut(self):
-        """Checks out the guest and makes the room available again."""
-        self.__availability_status = True  # Marks the room as available for booking
-    
-    def getRoomType(self):
-        """Returns the room type."""
-        return self.__room_type  # Returns room type
-    
-    def setRoomType(self, room_type):
-        """Sets the room type."""
-        self.__room_type = room_type  # Updates the room type
-    
-    def getPricePerNight(self):
-        """Returns the price per night."""
-        return self.__price_per_night  # Returns price per night
-    
-    def setPricePerNight(self, price):
-        """Sets the price per night."""
-        self.__price_per_night = price  # Updates the price per night
-    
-    def isAvailable(self):
-        """Returns whether the room is available."""
-        return self.__availability_status  # Returns room availability status
-    
-    def setAvailability(self, status):
-        """Sets the room availability status."""
-        self.__availability_status = status  # Updates room availability status
+            self.__availability_status = False
+            return True
+        return False
 
+    def check_out(self):  # Make the room available again
+        self.__availability_status = True
+
+    def is_available(self):  # Return True if available
+        return self.__availability_status
+
+    def get_room_type(self):  # Return room type
+        return self.__room_type
+
+    def get_price(self):  # Return room price
+        return self.__price_per_night
+
+# =============================
 # Class: Guest
-# Represents a guest, including their personal details and booking history
+# Aggregation with Hotel and Booking
+# =============================
 class Guest:
-    """Represents a hotel guest."""
-    
-    def __init__(self, guest_id, guest_name, contact_info, loyalty_points, email, nationality):
-        self.__guest_id = guest_id  # Unique guest ID
-        self.__guest_name = guest_name  # Guest's name
-        self.__contact_info = contact_info  # Guest's contact info (phone/email)
-        self.__loyalty_points = loyalty_points  # Points earned by the guest
-        self.__email = email  # Guest's email address
-        self.__nationality = nationality  # Guest's nationality
-    
-    def createAccount(self):
-        """Creates a new guest account."""
-        print(f"Account created for {self.__guest_name}")  # Confirmation message
-    
-    def updateProfile(self):
-        """Updates the guest profile."""
-        print(f"Profile updated for {self.__guest_name}")  # Confirmation message
-    
-    def viewReservationHistory(self):
-        """Views the guest's reservation history."""
-        print(f"Reservation history for {self.__guest_name}")  # Placeholder message
-    
-    def getLoyaltyPoints(self):
-        """Returns the guest's loyalty points."""
-        return self.__loyalty_points  # Returns loyalty points
-    
-    def setLoyaltyPoints(self, points):
-        """Sets the guest's loyalty points."""
-        self.__loyalty_points = points  # Updates loyalty points
-    
-    def getEmail(self):
-        """Returns the guest's email."""
-        return self.__email  # Returns email
-    
-    def setEmail(self, email):
-        """Sets the guest's email."""
-        self.__email = email  # Updates email
+    """Represents a guest who can book rooms and provide feedback."""
 
+    def __init__(self, guest_id: int, name: str, email: str, nationality: str):
+        self.__guest_id = guest_id  # Guest ID
+        self.__name = name  # Guest name
+        self.__email = email  # Guest email
+        self.__nationality = nationality  # Guest nationality
+        self.__loyalty_points = 0  # Loyalty points
+        self.__bookings = []  # Aggregation: guest can have multiple bookings
+
+    def create_account(self):  # Simulate account creation
+        print(f"Account created for {self.__name}")
+
+    def add_booking(self, booking):  # Add booking to guest history
+        self.__bookings.append(booking)
+
+    def view_reservation_history(self):  # View past bookings
+        print(f"Reservation history for {self.__name}:")
+        for b in self.__bookings:
+            print(f"Booking {b.get_id()} - {b.get_status()}")
+
+    def get_name(self):  # Get guest name
+        return self.__name
+
+    def get_loyalty_points(self):  # Get guest points
+        return self.__loyalty_points
+
+# =============================
 # Class: PremiumGuest
-# Inherits from Guest and adds premium-level features such as reward points and membership benefits
+# Inherits from Guest
+# =============================
 class PremiumGuest(Guest):
-    """Represents a premium guest."""
-    
-    def __init__(self, guest_id, guest_name, contact_info, loyalty_points, email, nationality,
-                 reward_points, membership_level, discount_percentage, vip_access):
-        super().__init__(guest_id, guest_name, contact_info, loyalty_points, email, nationality)
-        self.__reward_points = reward_points  # Reward points for premium guests
-        self.__membership_level = membership_level  # Membership level (e.g., Gold, Silver)
-        self.__discount_percentage = discount_percentage  # Discount percentage for premium guests
-        self.__vip_access = vip_access  # VIP access status
-    
-    def earnPoints(self, points):
-        """Earn points for premium guests."""
-        self.__reward_points += points  # Adds points to reward points
-    
-    def redeemPoints(self):
-        """Redeem reward points for premium guests."""
-        self.__reward_points = 0  # Resets reward points after redemption
-    
-    def upgradeMembership(self):
-        """Upgrades the membership level."""
-        self.__membership_level = "Gold"  # Upgrades to Gold level
-    
-    def getMembershipLevel(self):
-        """Returns the membership level."""
-        return self.__membership_level  # Returns membership level
-    
-    def setMembershipLevel(self, level):
-        """Sets a new membership level."""
-        self.__membership_level = level  # Updates membership level
-    
-    def getDiscountPercentage(self):
-        """Returns the discount percentage."""
-        return self.__discount_percentage  # Returns discount percentage
-    
-    def setDiscountPercentage(self, percentage):
-        """Sets the discount percentage."""
-        self.__discount_percentage = percentage  # Updates discount percentage
+    """Premium guest with membership and rewards."""
 
+    def __init__(self, guest_id: int, name: str, email: str, nationality: str):
+        super().__init__(guest_id, name, email, nationality)
+        self.__membership = "Silver"  # Membership level
+        self.__reward_points = 0  # Reward points
+
+    def upgrade_membership(self):  # Upgrade membership level
+        self.__membership = "Gold"
+
+# =============================
 # Class: Booking
-# Represents a booking made by a guest, linking the guest, room, and other booking details
+# Aggregation with Guest
+# Unary with Feedback
+# Binary with Payment
+# =============================
 class Booking:
-    """Represents a room booking."""
-    
-    def __init__(self, booking_id, guest, room, check_in_date, check_out_date, status, feedback=None):
+    """Represents a booking with optional feedback and payments."""
+
+    def __init__(self, booking_id: int, guest, room, check_in, check_out):
         self.__booking_id = booking_id  # Booking ID
-        self.__guest = guest  # Guest object
+        self.__guest = guest  # Guest object (Aggregation)
         self.__room = room  # Room object
-        self.__check_in_date = check_in_date  # Check-in date
-        self.__check_out_date = check_out_date  # Check-out date
-        self.__status = status  # Booking status (e.g., confirmed, canceled)
-        self.__feedback = feedback  # Feedback object (optional)
-    
-    def confirmBooking(self):
-        """Confirms the booking."""
-        self.__status = "Confirmed"  # Sets status to confirmed
-    
-    def cancelBooking(self):
-        """Cancels the booking."""
-        self.__status = "Canceled"  # Sets status to canceled
-    
-    def modifyBooking(self, new_dates):
-        """Modifies the booking with new dates."""
-        self.__check_in_date, self.__check_out_date = new_dates  # Updates the check-in and check-out dates
-    
-    def getCheckInDate(self):
-        """Returns the check-in date."""
-        return self.__check_in_date  # Returns check-in date
-    
-    def setCheckInDate(self, date):
-        """Sets the check-in date."""
-        self.__check_in_date = date  # Sets the check-in date
-    
-    def getCheckOutDate(self):
-        """Returns the check-out date."""
-        return self.__check_out_date  # Returns check-out date
-    
-    def setCheckOutDate(self, date):
-        """Sets the check-out date."""
-        self.__check_out_date = date  # Sets the check-out date
+        self.__check_in = check_in  # Check-in date
+        self.__check_out = check_out  # Check-out date
+        self.__status = "Pending"  # Booking status
+        self.__feedback = None  # Unary association with Feedback
+        self.__payments = []  # Binary association with Payment
 
+    def confirm_booking(self):  # Try to book the room
+        if self.__room.book_room():
+            self.__status = "Confirmed"
+            return True
+        return False
+
+    def cancel_booking(self):  # Cancel booking
+        self.__status = "Cancelled"
+        self.__room.check_out()
+
+    def add_feedback(self, feedback):  # Add feedback to booking
+        self.__feedback = feedback
+
+    def add_payment(self, payment):  # Add payment to booking
+        self.__payments.append(payment)
+
+    def get_status(self):  # Get booking status
+        return self.__status
+
+    def get_id(self):  # Get booking ID
+        return self.__booking_id
+
+# =============================
 # Class: Payment
-# Handles payment processing and details related to booking payments
+# Binary Association with Booking (1 booking → many payments)
+# =============================
 class Payment:
-    """Handles booking payment details."""
-    
-    def __init__(self, payment_id, payment_method, amount, transaction_date, is_successful):
+    """Handles a payment made for a booking."""
+
+    def __init__(self, payment_id: int, method: str, amount: float):
         self.__payment_id = payment_id  # Payment ID
-        self.__payment_method = payment_method  # Payment method (credit card, etc.)
+        self.__method = method  # Payment method
         self.__amount = amount  # Payment amount
-        self.__transaction_date = transaction_date  # Transaction date
-        self.__is_successful = is_successful  # Whether the payment was successful
-    
-    def processPayment(self):
-        """Processes the payment."""
-        self.__is_successful = self.__amount > 0  # Payment succeeds if the amount is positive
-    
-    def generateInvoice(self):
-        """Generates an invoice for the payment."""
-        return f"Invoice for Payment ID: {self.__payment_id}, Amount: ${self.__amount}"  # Returns formatted invoice
+        self.__is_successful = False  # Payment status
 
-    def getPaymentMethod(self):
-        """Returns the payment method."""
-        return self.__payment_method  # Returns payment method
-    
-    def setPaymentMethod(self, method):
-        """Sets the payment method."""
-        self.__payment_method = method  # Sets the payment method
-    
-    def getAmount(self):
-        """Returns the payment amount."""
-        return self.__amount  # Returns the amount paid
-    
-    def setAmount(self, amount):
-        """Sets the payment amount."""
-        self.__amount = amount  # Sets the payment amount
+    def process(self):  # Mark payment as successful
+        self.__is_successful = True if self.__amount > 0 else False
 
+    def generate_invoice(self):  # Return invoice string
+        return f"Payment ID: {self.__payment_id} | Amount: ${self.__amount}"
+
+# =============================
 # Class: Feedback
-# Stores feedback provided by guests after booking
+# Unary Association with Booking
+# =============================
 class Feedback:
-    """Stores guest feedback after booking."""
-    
-    def __init__(self, feedback_id, rating, comments, submission_date, guest_name):
+    """Stores guest feedback after a booking."""
+
+    def __init__(self, feedback_id: int, rating: int, comments: str, guest_name: str):
         self.__feedback_id = feedback_id  # Feedback ID
-        self.__rating = rating  # Rating given by the guest
-        self.__comments = comments  # Feedback comments
-        self.__submission_date = submission_date  # Date the feedback was submitted
-        self.__guest_name = guest_name  # Guest's name who provided feedback
-    
-    def submitFeedback(self):
-        """Submits feedback from the guest."""
-        print(f"Feedback submitted by {self.__guest_name}: Rating {self.__rating}, Comments: {self.__comments}")
-    
-    def getFeedbackDetails(self):
-        """Returns feedback details as a string."""
-        return f"Rating: {self.__rating}, Comments: {self.__comments}"  # Returns feedback details
-    
-    def getRating(self):
-        """Returns the rating given by the guest."""
-        return self.__rating  # Returns rating
-    
-    def setRating(self, rating):
-        """Sets the rating."""
-        self.__rating = rating  # Updates the rating
-    
-    def getComments(self):
-        """Returns the comments given by the guest."""
-        return self.__comments  # Returns comments
-    
-    def setComments(self, comments):
-        """Sets the comments."""
-        self.__comments = comments  # Updates comments
+        self.__rating = rating  # Rating (1–5)
+        self.__comments = comments  # Comment text
+        self.__guest_name = guest_name  # Guest who submitted
+
+    def submit(self):  # Print feedback to console
+        print(f"Feedback from {self.__guest_name}: {self.__comments} (Rating: {self.__rating})")
+
 
 
