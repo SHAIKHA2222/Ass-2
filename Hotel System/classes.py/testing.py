@@ -1,53 +1,77 @@
-from datetime import date
-from classes import Guest, Room, Booking, Payment
 
-# Test case 1: Guest Account Creation
-def test_guest_account_creation():
-    guest1 = Guest(1, "John Doe", "john@example.com", 100, "john.doe@email.com", "USA")
-    guest1.createAccount()  # Testing account creation for John Doe
-    guest1.setEmail("new.john@example.com")  # Changing email as part of profile update
-    print(f"Updated Email: {guest1.getEmail()}")  # Verifying if email is updated
+# =============================
+# TESTING SECTION – Reflects all associations in UML
+# =============================
+def run_tests():
+    print("===== TESTING HOTEL SYSTEM =====")  # Header for test output
 
-    guest2 = Guest(2, "Jane Smith", "jane@example.com", 200, "jane.smith@email.com", "UK")
-    guest2.createAccount()  # Testing account creation for Jane Smith
+    # Create a hotel and add rooms (Composition)
+    hotel = Hotel("Royal Stay", "Dubai", 5, "+971-55-1234567")  # Hotel instance
+    room1 = Room(101, "Single", 200, ["Wi-Fi", "TV"])  # Room 101
+    room2 = Room(102, "Double", 300, ["Wi-Fi", "TV", "Mini-bar"])  # Room 102
+    hotel.add_room(room1)  # Add room1 to hotel
+    hotel.add_room(room2)  # Add room2 to hotel
 
-# Test case 2: Searching for Available Rooms
-def test_search_available_rooms():
-    room1 = Room(101, "Single", 120, True, ["Wi-Fi", "TV"], 2, 1)
-    room2 = Room(102, "Double", 180, False, ["Wi-Fi", "TV", "Mini-Bar"], 4, 1)
+    # Create guest accounts (Aggregation)
+    guest1 = Guest(1, "Alice", "alice@email.com", "UAE")  # First guest
+    guest2 = PremiumGuest(2, "Bob", "bob@email.com", "UK")  # Premium guest
+    guest1.create_account()  # Simulate account creation
+    guest2.create_account()
 
-    rooms = [room1, room2]
-    available_rooms = [room for room in rooms if room.isAvailable()]
-    
-    print(f"Available Rooms: {[room.getRoomType() for room in available_rooms]}")  # Verifying available rooms
+    # Search and display available rooms
+    print("\nAvailable Rooms:")
+    for room in hotel.get_available_rooms():  # Loop through available rooms
+        print(f"Room Type: {room.get_room_type()}, Price: {room.get_price()}")  # Display room info
 
-# Test case 3: Making a Room Reservation
-def test_room_reservation():
-    guest = Guest(1, "Emily Johnson", "emily@example.com", 500, "emily.j@example.com", "Canada")
-    room = Room(103, "Suite", 250, True, ["Wi-Fi", "Mini-Bar", "Gym"], 3, 2)
-    booking = Booking(1, guest, room, date(2025, 3, 10), date(2025, 3, 15), "Pending")
-    
-    booking.confirmBooking()  # Confirming the booking
-    print(f"Booking Status: {booking.__dict__['__status']}")  # Verifying booking status
+    # Make bookings (Aggregation)
+    booking1 = Booking(1001, guest1, room1, date(2025, 3, 28), date(2025, 3, 30))  # Booking by guest1
+    booking2 = Booking(1002, guest2, room2, date(2025, 3, 28), date(2025, 3, 30))  # Booking by guest2
 
-# Test case 4: Booking Confirmation Notification
-def test_booking_confirmation_notification():
-    guest = Guest(2, "Michael Brown", "michael@example.com", 200, "michael.b@email.com", "Germany")
-    room = Room(104, "Single", 150, True, ["Wi-Fi"], 1, 2)
-    booking = Booking(2, guest, room, date(2025, 3, 12), date(2025, 3, 14), "Pending")
-    booking.confirmBooking()  # Confirming the booking
-    print(f"Booking Status: {booking.__dict__['__status']}")  # Verifying confirmation
+    # Confirm bookings
+    if booking1.confirm_booking():
+        print(f"Booking {booking1.get_id()} confirmed for {guest1.get_name()}")  # Confirm guest1
+    if booking2.confirm_booking():
+        print(f"Booking {booking2.get_id()} confirmed for {guest2.get_name()}")  # Confirm guest2
 
-# Test case 5: Processing Payment
-def test_payment_processing():
-    payment = Payment(1, "Credit Card", 250, date.today(), False)
-    payment.processPayment()  # Processing the payment
-    print(f"Payment Success: {payment.__dict__['__is_successful']}")  # Verifying payment status
+    # Add bookings to guest history
+    guest1.add_booking(booking1)  # Add booking1 to guest1
+    guest2.add_booking(booking2)  # Add booking2 to guest2
 
-# Run test cases
-test_guest_account_creation()
-test_search_available_rooms()
-test_room_reservation()
-test_booking_confirmation_notification()
-test_payment_processing()
+    # Submit feedback (Unary)
+    fb1 = Feedback(5001, 5, "Excellent stay!", guest1.get_name())  # Feedback by guest1
+    fb2 = Feedback(5002, 4, "Very clean and comfortable.", guest2.get_name())  # Feedback by guest2
+    booking1.add_feedback(fb1)  # Attach feedback to booking1
+    booking2.add_feedback(fb2)  # Attach feedback to booking2
+    fb1.submit()  # Submit feedback1
+    fb2.submit()  # Submit feedback2
+
+    # Create and process payments (Binary)
+    payment1a = Payment(2001, "Credit Card", 150)  # First part payment by guest1
+    payment1b = Payment(2002, "Mobile Wallet", 50)  # Second part payment by guest1
+    payment2 = Payment(2003, "Debit Card", 300)  # Full payment by guest2
+
+    for p in [payment1a, payment1b, payment2]:  # Process all payments
+        p.process()
+
+    booking1.add_payment(payment1a)  # Link payment1a to booking1
+    booking1.add_payment(payment1b)  # Link payment1b to booking1
+    booking2.add_payment(payment2)  # Link payment2 to booking2
+
+    # Display invoices
+    print("\nInvoices:")
+    for p in [payment1a, payment1b, payment2]:
+        print(p.generate_invoice())  # Print invoice for each payment
+
+    # View reservation histories
+    print("\nReservation History:")
+    guest1.view_reservation_history()  # Guest1's bookings
+    guest2.view_reservation_history()  # Guest2's bookings
+
+    # Cancel a booking
+    booking1.cancel_booking()  # Cancel booking1
+    print(f"\nBooking {booking1.get_id()} status after cancellation: {booking1.get_status()}")  # Show status
+
+# Run the test function when this file is executed
+if __name__ == "__main__":
+    run_tests()
 
